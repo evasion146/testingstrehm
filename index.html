@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Download Addon</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h1>My Stremio Download Addon</h1>
+    <p id="output">Loading...</p>
+    
+    <script>
+        // Your addon configuration
+        const manifest = {
+            "id": "my.download.addon",
+            "version": "1.0.0",
+            "name": "📥 My Download Addon",
+            "description": "Adds download links to Stremio!",
+            "resources": ["stream"],
+            "types": ["movie", "series"],
+            "idPrefixes": ["tt"],
+            "catalogs": []
+        };
+
+        // Parse the URL to see what Stremio is requesting
+        const path = window.location.pathname;
+        const output = document.getElementById('output');
+        
+        // Set proper content type for JSON responses
+        function respondWithJSON(data) {
+            document.body.innerHTML = '';
+            const pre = document.createElement('pre');
+            pre.textContent = JSON.stringify(data, null, 2);
+            document.body.appendChild(pre);
+            document.contentType = 'application/json';
+        }
+        
+        // Handle different endpoints
+        if (path.includes('manifest.json')) {
+            // Stremio is asking for addon info
+            respondWithJSON(manifest);
+            
+        } else if (path.includes('/stream/')) {
+            // Stremio is asking for streams!
+            // Extract the IMDB ID from the URL
+            const parts = path.split('/');
+            const type = parts[2]; // movie or series
+            const id = parts[3];   // tt1234567
+            
+            console.log(`Request for ${type} with ID: ${id}`);
+            
+            // Create some example streams
+            const streams = {
+                streams: [
+                    {
+                        name: "📥 Download HD",
+                        title: "Download 1080p (Click to open Real-Debrid)",
+                        externalUrl: "https://real-debrid.com/torrents"
+                    },
+                    {
+                        name: "📥 Download SD", 
+                        title: "Download 720p (Click to open Real-Debrid)",
+                        externalUrl: "https://real-debrid.com/torrents"
+                    },
+                    {
+                        name: "🎬 Stream",
+                        title: "Example Stream (YouTube)",
+                        url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                    }
+                ]
+            };
+            
+            respondWithJSON(streams);
+            
+        } else {
+            // Default page
+            output.innerHTML = `
+                <h2>✅ Your addon is working!</h2>
+                <p>To test it:</p>
+                <ol>
+                    <li>Add this URL to Stremio: <code>${window.location.origin}/manifest.json</code></li>
+                    <li>Find any movie or show</li>
+                    <li>Click on it</li>
+                    <li>You'll see your custom download options!</li>
+                </ol>
+                <hr>
+                <p><strong>Current URL:</strong> ${window.location.href}</p>
+                <p><strong>Path:</strong> ${path}</p>
+            `;
+        }
+    </script>
+</body>
+</html>
