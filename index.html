@@ -3,75 +3,74 @@
 <head>
     <title>My Download Addon</title>
     <meta charset="UTF-8">
-</head>
-<body>
     <script>
-        // Your addon configuration
-        const manifest = {
-            "id": "my.download.addon",
-            "version": "1.0.0",
-            "name": "📥 My Download Addon",
-            "description": "Adds download links to Stremio!",
-            "resources": ["stream"],
-            "types": ["movie", "series"],
-            "idPrefixes": ["tt"],
-            "catalogs": []
-        };
-
-        // Parse the URL to see what Stremio is requesting
-        const path = window.location.pathname;
+        // Parse the URL path
+        const path = window.location.pathname.replace('/testingstrehm', '');
         
-        // IMPORTANT: Return pure JSON for manifest and stream requests
-        if (path.includes('manifest.json')) {
-            // Return ONLY JSON, no HTML!
-            document.write(JSON.stringify(manifest));
-            
-        } else if (path.includes('/stream/')) {
-            // Stremio is asking for streams!
+        // Handle stream requests
+        if (path.includes('/stream/')) {
+            // Extract movie/series ID from path
+            // Format: /stream/movie/tt1234567.json or /stream/series/tt1234567:1:1.json
             const parts = path.split('/');
-            const type = parts[2]; // movie or series
-            const id = parts[3];   // tt1234567
+            const type = parts[2]; // 'movie' or 'series'
+            const id = parts[3].replace('.json', ''); // Remove .json extension
             
-            // Create some example streams
-            const streams = {
+            console.log('Stream request for:', type, id);
+            
+            // Create response with download options
+            const response = {
                 streams: [
                     {
-                        name: "📥 Download HD",
-                        title: "Download 1080p (Click to open Real-Debrid)",
-                        externalUrl: "https://real-debrid.com/torrents"
+                        title: "📥 Download HD 1080p",
+                        name: "Download",
+                        externalUrl: "https://real-debrid.com/torrents",
+                        behaviorHints: {
+                            notWebReady: true
+                        }
                     },
                     {
-                        name: "📥 Download SD", 
-                        title: "Download 720p (Click to open Real-Debrid)",
-                        externalUrl: "https://real-debrid.com/torrents"
+                        title: "📥 Download 720p", 
+                        name: "Download",
+                        externalUrl: "https://real-debrid.com/torrents",
+                        behaviorHints: {
+                            notWebReady: true
+                        }
                     },
                     {
-                        name: "🎬 Stream",
-                        title: "Example Stream (YouTube)",
-                        url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                        title: "💾 Save Offline (Real-Debrid)",
+                        name: "Download", 
+                        externalUrl: `https://real-debrid.com/torrents?search=${id}`,
+                        behaviorHints: {
+                            notWebReady: true
+                        }
                     }
                 ]
             };
             
-            // Return ONLY JSON!
-            document.write(JSON.stringify(streams));
+            // Clear the page and output only JSON
+            document.open();
+            document.write(JSON.stringify(response));
+            document.close();
+            
+            // Set content type
+            document.contentType = 'application/json';
+            
+        } else if (path.includes('manifest.json')) {
+            // Redirect to the actual manifest.json file
+            window.location.href = '/testingstrehm/manifest.json';
             
         } else {
-            // Default page for humans
+            // Homepage
             document.write(`
-                <h1>✅ Your addon is working!</h1>
-                <p>To test it:</p>
-                <ol>
-                    <li>Add this URL to Stremio: <code>${window.location.origin}/manifest.json</code></li>
-                    <li>Find any movie or show</li>
-                    <li>Click on it</li>
-                    <li>You'll see your custom download options!</li>
-                </ol>
+                <h1>✅ My Download Addon is Installed!</h1>
+                <p>The addon is working. Go to Stremio and click on any movie or TV show to see download options.</p>
                 <hr>
-                <p><strong>Current URL:</strong> ${window.location.href}</p>
-                <p><strong>Path:</strong> ${path}</p>
+                <p>Addon URL: <code>https://evasion146.github.io/testingstrehm/manifest.json</code></p>
+                <p>Current path: ${path}</p>
             `);
         }
     </script>
+</head>
+<body>
 </body>
 </html>
