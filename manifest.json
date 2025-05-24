@@ -1,0 +1,10 @@
+json{
+  "id": "my.download.addon",
+  "version": "1.0.0",
+  "name": "📥 My Download Addon",
+  "description": "Adds download links to Stremio!",
+  "resources": ["stream"],
+  "types": ["movie", "series"],
+  "idPrefixes": ["tt"],
+  "catalogs": []
+}
